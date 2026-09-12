@@ -18,7 +18,6 @@ import { ORGANIZATION_SCHEMA } from '@/lib/seo';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import WhatsAppFloat from '@/components/WhatsAppFloat';
-import CookieConsent from '@/components/CookieConsent';
 import './globals.css';
 
 // ===== Optimize Google Fonts =====
@@ -82,7 +81,7 @@ export const metadata: Metadata = {
   },
   alternates: {
     languages: {
-      'en-NG': process.env.NEXT_PUBLIC_SITE_URL || 'https://www.kingpraisewebdesign.name.ng',
+      'en-ng': process.env.NEXT_PUBLIC_SITE_URL || 'https://www.kingpraisewebdesign.name.ng',
       'x-default': process.env.NEXT_PUBLIC_SITE_URL || 'https://www.kingpraisewebdesign.name.ng',
     },
   },
@@ -131,8 +130,6 @@ export default function RootLayout({
         />
 
         {/* ===== Preconnect to External Services ===== */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://res.cloudinary.com" />
 
         {/* ===== DNS Prefetch ===== */}
@@ -146,8 +143,39 @@ export default function RootLayout({
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/assets/img/favicon.png" />
 
-        {/* ===== Google Analytics (GA4) & GTM ===== */}
-        {/* Loaded only after consent — see <CookieConsent /> in body, which injects them. */}
+        {/* ===== Google Analytics (GA4) ===== */}
+        <Script
+          async
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID || 'G-2BBFZB00KV'}`}
+          strategy="afterInteractive"
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${process.env.NEXT_PUBLIC_GA_ID || 'G-2BBFZB00KV'}');
+            `,
+          }}
+        />
+
+        {/* ===== Google Tag Manager (GTM) ===== */}
+        <Script
+          id="google-tag-manager"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+              })(window,document,'script','dataLayer','GTM-KGCCDXX9');
+            `,
+          }}
+        />
 
         {/* ===== Organization Schema (Sitewide) ===== */}
         <script
@@ -162,7 +190,15 @@ export default function RootLayout({
         className="bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans antialiased transition-colors duration-200"
         suppressHydrationWarning
       >
-        {/* GTM noscript iframe is injected by <CookieConsent /> only after the user accepts. */}
+        {/* ===== Google Tag Manager NoScript (for JS-disabled users) ===== */}
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-KGCCDXX9"
+            height="0"
+            width="0"
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
 
         {/* ===== Page Loader (initial load only) ===== */}
         <div
@@ -185,7 +221,6 @@ export default function RootLayout({
           <Footer />
         </div>
         <WhatsAppFloat />
-        <CookieConsent />
 
         {/* Add <Analytics /> here if you install @vercel/analytics and deploy on Vercel */}
 

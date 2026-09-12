@@ -1,105 +1,218 @@
-import type { Metadata } from 'next';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { generateMetadata as buildMeta, getBlogPostMeta } from '@/lib/seo';
-import { formatDate } from '@/lib/utils';
+/**
+ * Blog Page (/blog)
+ * Server Component (SSR)
+ * Fetches published blog posts from backend API
+ */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:5000/api';
+import { Metadata } from 'next';
+import Link from 'next/link';
+import Image from 'next/image';
+import { PAGE_META, generateMetadata, injectSchema, getBreadcrumbSchema } from '@/lib/seo';
+import NewsletterForm from '@/components/NewsletterForm';
+
+// ===== Metadata =====
+export const metadata: Metadata = generateMetadata(PAGE_META.blog);
+
+// ===== Revalidation =====
+export const revalidate = 3600; // Revalidate every 1 hour (ISR)
+
+// ===== Breadcrumb Schema =====
+const breadcrumbSchema = getBreadcrumbSchema([
+  { name: 'Home', url: 'https://www.kingpraisewebdesign.name.ng' },
+  { name: 'Blog', url: 'https://www.kingpraisewebdesign.name.ng/blog' },
+]);
 
 interface BlogPost {
+  _id: string;
   title: string;
+  excerpt: string;
   slug: string;
-  content: string;
-  excerpt?: string;
+  coverImage?: {
+    url: string;
+    publicId: string;
+  };
+  author: {
+    _id: string;
+    name: string;
+  };
   category?: string;
   tags?: string[];
-  views?: number;
+  views: number;
   createdAt: string;
-  updatedAt?: string;
-  coverImage?: { url?: string };
+  status: string;
 }
 
-async function getPost(slug: string): Promise<BlogPost | null> {
+/**
+ * Fetch blog posts from backend API
+ */
+async function getBlogPosts(): Promise<BlogPost[]> {
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:5000/api';
+
   try {
-    const res = await fetch(`${API_BASE}/blog/${slug}`, { next: { revalidate: 300 } });
-    if (!res.ok) return null;
+    const res = await fetch(`${apiBase}/blog`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      next: { revalidate: 3600 }, // Cache for 1 hour
+    });
+
+    if (!res.ok) {
+      console.error(`Blog API error: ${res.status}`);
+      return [];
+    }
+
     const data = await res.json();
-    return data.post || data.data || null;
-  } catch {
-    return null;
+    return data.posts || [];
+  } catch (error) {
+    console.error('Failed to fetch blog posts:', error);
+    return [];
   }
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const post = await getPost(params.slug);
-  if (!post) return { title: 'Post Not Found' };
-  return buildMeta(
-    getBlogPostMeta({
-      title: post.title,
-      excerpt: post.excerpt || post.title,
-      slug: post.slug,
-      coverImage: post.coverImage?.url,
-      createdAt: post.createdAt,
-      updatedAt: post.updatedAt || post.createdAt,
-    })
-  );
+/**
+ * Format date for display
+ */
+function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat('en-NG', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(date);
 }
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-  const post = await getPost(params.slug);
-  if (!post) notFound();
-
-  const date = formatDate(post.createdAt);
-  const updated = post.updatedAt && post.updatedAt !== post.createdAt ? formatDate(post.updatedAt) : null;
-
-  const articleSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: post.title,
-    description: post.excerpt || post.title,
-    image: post.coverImage?.url ? [post.coverImage.url] : undefined,
-    datePublished: post.createdAt,
-    dateModified: post.updatedAt || post.createdAt,
-    author: { '@type': 'Person', name: 'King Praise', url: 'https://www.kingpraisewebdesign.name.ng/about' },
-    publisher: {
-      '@type': 'Organization',
-      name: 'King Praise Web Design',
-      logo: { '@type': 'ImageObject', url: 'https://www.kingpraisewebdesign.name.ng/assets/img/logo-full.png' },
-    },
-  };
+/**
+ * Blog Page Component
+ */
+export default async function BlogPage() {
+  const posts = await getBlogPosts();
 
   return (
-    <main className="pt-40 pb-24 max-w-3xl mx-auto px-5 lg:px-8">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+    <>
+      {/* Inject breadcrumb schema */}
+      {injectSchema(breadcrumbSchema)}
 
-      <div className="flex items-center gap-4">
-        <Link href="/" className="text-sm text-[var(--brand-2)] hover:underline">← Back to Home</Link>
-        <span className="text-slate-600">|</span>
-        <Link href="/blog" className="text-sm text-[var(--brand-2)] hover:underline">← Back to Blog</Link>
-      </div>
+      <main className="flex-1">
+        {/* ===== Hero Section ===== */}
+        <section className="relative overflow-hidden py-20 sm:py-32">
+          <div className="glow-orb bg-[var(--brand)] w-96 h-96 -top-32 -left-32" />
 
-      <article className="mt-8">
-        <p className="text-[var(--brand-2)] text-sm font-semibold uppercase tracking-wide mb-3">{post.category || 'General'}</p>
-        <h1 className="font-display text-3xl md:text-5xl font-bold text-white leading-tight">{post.title}</h1>
-        <div className="flex items-center gap-3 text-slate-500 text-sm mt-5 flex-wrap">
-          <Link href="/about" className="text-[var(--brand-2)] hover:underline">King Praise</Link>
-          <span>&middot;</span>
-          <span>{date}</span>
-          {updated && (<><span>&middot;</span><span>Updated {updated}</span></>)}
-          <span>&middot;</span>
-          <span>{post.views || 0} views</span>
-        </div>
-        {post.coverImage?.url && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={post.coverImage.url} alt={post.title} className="w-full rounded-2xl mt-8 object-cover max-h-[480px]" />
-        )}
-        <div className="prose-invert max-w-none mt-10 text-slate-300 leading-relaxed" dangerouslySetInnerHTML={{ __html: post.content }} />
-        <div className="flex flex-wrap gap-2 mt-10">
-          {(post.tags || []).map((t) => (
-            <span key={t} className="text-xs px-3 py-1 rounded-full bg-white/5 text-slate-300">#{t}</span>
-          ))}
-        </div>
-      </article>
-    </main>
+          <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 className="text-4xl sm:text-5xl font-bold mb-6">
+              Web Design Blog
+            </h1>
+            <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+              Tips, guides, and case studies on web design, SEO, e-commerce, and digital marketing for small businesses.
+            </p>
+          </div>
+        </section>
+
+        {/* ===== Blog Posts Grid ===== */}
+        <section className="py-20 sm:py-32">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            {posts.length > 0 ? (
+              <>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {posts.map((post) => (
+                    <article
+                      key={post._id}
+                      className="glass rounded-2xl overflow-hidden hover:border-[var(--brand)]/50 transition-all group"
+                    >
+                      {/* Featured Image */}
+                      {post.coverImage?.url && (
+                        <div className="relative h-48 overflow-hidden">
+                          <Image
+                            src={post.coverImage.url}
+                            alt={post.title}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      )}
+
+                      {/* Content */}
+                      <div className="p-6">
+                        {/* Category & Date */}
+                        <div className="flex items-center justify-between mb-3">
+                          {post.category && (
+                            <span className="text-xs font-semibold uppercase text-[var(--brand)]">
+                              {post.category}
+                            </span>
+                          )}
+                          <span className="text-xs text-slate-400">
+                            {formatDate(post.createdAt)}
+                          </span>
+                        </div>
+
+                        {/* Title */}
+                        <h3 className="text-lg font-semibold mb-3 line-clamp-2">
+                          <Link
+                            href={`/blog/${post.slug}`}
+                            className="hover:text-[var(--brand)] transition-colors"
+                          >
+                            {post.title}
+                          </Link>
+                        </h3>
+
+                        {/* Excerpt */}
+                        <p className="text-slate-400 text-sm line-clamp-3 mb-4">
+                          {post.excerpt}
+                        </p>
+
+                        {/* Author & Read More */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-slate-500">
+                            By {post.author.name}
+                          </span>
+                          <Link
+                            href={`/blog/${post.slug}`}
+                            className="text-xs font-semibold text-[var(--brand)] hover:text-[var(--brand-2)] transition-colors"
+                          >
+                            Read More →
+                          </Link>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+
+                {/* Load More CTA (optional) */}
+                {posts.length >= 9 && (
+                  <div className="text-center mt-12">
+                    <button className="btn btn-outline">
+                      Load More Articles
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+              /* Empty State */
+              <div className="text-center py-20">
+                <h2 className="text-2xl font-semibold mb-2">No articles yet</h2>
+                <p className="text-slate-400 mb-6">
+                  Check back soon for insights on web design and digital marketing.
+                </p>
+                <Link href="/" className="btn btn-ghost">
+                  Back to Home
+                </Link>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* ===== Newsletter CTA ===== */}
+        <section className="py-20 sm:py-32 bg-[var(--bg-secondary)] border-t border-[var(--border)]">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl font-bold mb-4">
+              Get Web Design Tips in Your Inbox
+            </h2>
+            <p className="text-slate-400 mb-8">
+              Subscribe to our newsletter for the latest articles, case studies, and industry insights.
+            </p>
+
+            <NewsletterForm />
+          </div>
+        </section>
+      </main>
+    </>
   );
 }

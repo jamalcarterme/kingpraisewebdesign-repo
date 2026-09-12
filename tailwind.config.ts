@@ -10,8 +10,8 @@ const config: Config = {
       // ===== Color System (from existing design) =====
       colors: {
         // Brand colors (matches existing CSS variables)
-        brand: 'var(--brand, #10B981)', // Emerald/teal primary
-        'brand-2': 'var(--brand-2, #06B6D4)', // Cyan secondary
+        brand: 'var(--brand, #FFB80C)', // Emerald/teal primary
+        'brand-2': 'var(--brand-2, #FFCB4D)', // Cyan secondary
         // Dark theme background
         dark: '#07070A',
         // Light theme background
@@ -84,14 +84,14 @@ const config: Config = {
         'lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
         'xl': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
         '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-        'glow': '0 0 30px rgba(16, 185, 129, 0.3)',
-        'glow-cyan': '0 0 30px rgba(6, 182, 212, 0.3)',
+        'glow': '0 0 30px rgba(255, 184, 12, 0.3)',
+        'glow-cyan': '0 0 30px rgba(255, 203, 77, 0.3)',
         'inner': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)',
         'none': 'none',
       },
       // ===== Gradients =====
       backgroundImage: {
-        'gradient-brand': 'linear-gradient(135deg, var(--brand, #10B981), var(--brand-2, #06B6D4))',
+        'gradient-brand': 'linear-gradient(135deg, var(--brand, #FFB80C), var(--brand-2, #FFCB4D))',
         'gradient-dark': 'linear-gradient(135deg, #07070A, #1A1A1F)',
       },
       // ===== Transitions =====

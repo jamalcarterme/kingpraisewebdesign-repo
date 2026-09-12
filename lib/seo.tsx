@@ -25,6 +25,12 @@ export interface SEOMetadata {
   articlePublished?: string;
   articleModified?: string;
   articleAuthor?: string;
+  geo?: {
+    region: string;
+    placename: string;
+    position: string;
+    icbm: string;
+  };
 }
 
 /**
@@ -39,6 +45,7 @@ export function generateMetadata(seo: SEOMetadata): Metadata {
     canonical = SITE_URL,
     noindex = false,
     ogType = 'website',
+    geo,
   } = seo;
 
   const robots = [];
@@ -69,16 +76,18 @@ export function generateMetadata(seo: SEOMetadata): Metadata {
     alternates: {
       canonical,
       languages: {
-        'en-NG': `${SITE_URL}`,
-        'x-default': `${SITE_URL}`,
+        'en-ng': canonical,
+        'x-default': canonical,
       },
     },
-    other: {
-      'geo.region': 'NG-LA',
-      'geo.placename': 'Lagos, Nigeria',
-      'geo.position': '6.5244;3.3792',
-      ICBM: '6.5244, 3.3792',
-    },
+    other: geo
+      ? {
+          'geo.region': geo.region,
+          'geo.placename': geo.placename,
+          'geo.position': geo.position,
+          ICBM: geo.icbm,
+        }
+      : {},
   };
 }
 
@@ -117,6 +126,7 @@ export const PAGE_META: Record<string, SEOMetadata> = {
         { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Mobile App Development' } },
       ],
     },
+    geo: { region: 'NG-LA', placename: 'Lagos, Nigeria', position: '6.5244;3.3792', icbm: '6.5244, 3.3792' },
   },
 
   about: {
@@ -128,6 +138,7 @@ export const PAGE_META: Record<string, SEOMetadata> = {
       '@context': 'https://schema.org',
       '@type': 'AboutPage',
     },
+    geo: { region: 'NG-LA', placename: 'Lagos, Nigeria', position: '6.5244;3.3792', icbm: '6.5244, 3.3792' },
   },
 
   services: {
@@ -145,6 +156,7 @@ export const PAGE_META: Record<string, SEOMetadata> = {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
     },
+    geo: { region: 'NG-LA', placename: 'Lagos, Nigeria', position: '6.5244;3.3792', icbm: '6.5244, 3.3792' },
   },
 
   blog: {
@@ -152,6 +164,7 @@ export const PAGE_META: Record<string, SEOMetadata> = {
     description:
       'Read our latest articles on web design, SEO, e-commerce, and digital marketing tips for small businesses.',
     keywords: ['web design blog', 'web design tips', 'digital marketing', 'seo guide'],
+    geo: { region: 'NG-LA', placename: 'Lagos, Nigeria', position: '6.5244;3.3792', icbm: '6.5244, 3.3792' },
   },
 
   contact: {
@@ -163,6 +176,7 @@ export const PAGE_META: Record<string, SEOMetadata> = {
       '@context': 'https://schema.org',
       '@type': 'ContactPage',
     },
+    geo: { region: 'NG-LA', placename: 'Lagos, Nigeria', position: '6.5244;3.3792', icbm: '6.5244, 3.3792' },
   },
 
   portfolio: {
@@ -170,6 +184,7 @@ export const PAGE_META: Record<string, SEOMetadata> = {
     description:
       'View our latest web design and development projects. See how we help businesses succeed online.',
     keywords: ['portfolio', 'case studies', 'web design examples', 'client projects'],
+    geo: { region: 'NG-LA', placename: 'Lagos, Nigeria', position: '6.5244;3.3792', icbm: '6.5244, 3.3792' },
   },
 
   pricing: {
@@ -181,6 +196,7 @@ export const PAGE_META: Record<string, SEOMetadata> = {
       '@context': 'https://schema.org',
       '@type': 'PricingPage',
     },
+    geo: { region: 'NG-LA', placename: 'Lagos, Nigeria', position: '6.5244;3.3792', icbm: '6.5244, 3.3792' },
   },
 
   adminDashboard: {
@@ -199,57 +215,59 @@ export const PAGE_META: Record<string, SEOMetadata> = {
 /**
  * Location page metadata (dynamic)
  */
-export function getLocationMeta(location: string, cityName: string): SEOMetadata {
-  const title = `Web Design Company in ${cityName} | King Praise Web Design`;
-  const description = `Custom website design and development services in ${cityName}, Nigeria. Fast, SEO-friendly websites for local businesses.`;
+export function getLocationMeta(
+  location: import('./data/locations').LocationPage
+): SEOMetadata {
+  const canonical = `${SITE_URL}/locations/${location.slug}`;
+  const schema: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: SITE_NAME,
+    telephone: BRAND_PHONE,
+    email: BRAND_EMAIL,
+    url: canonical,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: location.business.addressLocality,
+      addressRegion: location.business.addressRegion,
+      addressCountry: location.business.addressCountry,
+    },
+    areaServed: { '@type': 'City', name: location.business.areaServedName },
+  };
+  if (location.business.latitude && location.business.longitude) {
+    schema.geo = {
+      '@type': 'GeoCoordinates',
+      latitude: location.business.latitude,
+      longitude: location.business.longitude,
+    };
+  }
 
   return {
-    title,
-    description,
-    keywords: [
-      `web design ${cityName.toLowerCase()}`,
-      `website designer ${cityName.toLowerCase()}`,
-      `web development ${cityName.toLowerCase()}`,
-      `web design company ${cityName.toLowerCase()}`,
-    ],
-    canonical: `${SITE_URL}/locations/${location}`,
-    schema: {
-      '@context': 'https://schema.org',
-      '@type': 'LocalBusiness',
-      name: SITE_NAME,
-      address: {
-        '@type': 'PostalAddress',
-        addressLocality: cityName,
-        addressRegion: 'Nigeria',
-        addressCountry: 'NG',
-      },
-      telephone: BRAND_PHONE,
-      url: SITE_URL,
-    },
+    title: location.metaTitle,
+    description: location.metaDescription,
+    keywords: location.keywords,
+    canonical,
+    geo: location.geo,
+    schema,
   };
 }
 
 /**
  * Service page metadata (dynamic)
  */
-export function getServiceMeta(service: string, serviceName: string): SEOMetadata {
-  const title = `${serviceName} – Custom Web Design & Development`;
-  const description = `Professional ${serviceName.toLowerCase()} services from King Praise Web Design. Expert solutions for businesses.`;
+export function getServiceMeta(
+  service: import('./data/services').ServicePage
+): SEOMetadata {
+  const canonical = `${SITE_URL}/services/${service.slug}`;
 
   return {
-    title,
-    description,
-    keywords: [
-      serviceName.toLowerCase(),
-      `${serviceName.toLowerCase()} design`,
-      `${serviceName.toLowerCase()} development`,
-      `custom ${serviceName.toLowerCase()}`,
-    ],
-    canonical: `${SITE_URL}/services/${service}`,
+    title: service.metaTitle,
+    description: service.metaDescription,
+    canonical,
     schema: {
       '@context': 'https://schema.org',
       '@type': 'Service',
-      name: serviceName,
+      name: service.serviceName,
       provider: {
         '@type': 'Organization',
         name: SITE_NAME,

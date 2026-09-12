@@ -15,21 +15,22 @@
 /* ===== CSS Variables (Theme System) ===== */
 :root,
 [data-theme='dark'] {
-  --brand: #10b981; /* Emerald primary */
-  --brand-2: #06b6d4; /* Cyan secondary */
+  --brand: #ffb80c;
+  --brand-2: #ffcb4d;
+  --brand-3: #c98a00;
 
   --bg-primary: #07070a;
-  --bg-secondary: #0f0f14;
-  --bg-tertiary: #1a1a1f;
+  --bg-secondary: #121212;
+  --bg-tertiary: #1b1b1b;
 
-  --text-primary: #e5e7eb;
-  --text-secondary: #9ca3af;
+  --text-primary: #f2f0ea;
+  --text-secondary: #9c9890;
 
-  --border: #2a2a30;
-  --border-light: #3a3a40;
+  --border: #2a2a2a;
+  --border-light: #3a3a3a;
 
-  --glow-brand: rgba(16, 185, 129, 0.1);
-  --glow-brand-2: rgba(6, 182, 212, 0.1);
+  --glow-brand: rgba(255, 184, 12, 0.12);
+  --glow-brand-2: rgba(255, 203, 77, 0.12);
 
   /* Aliases used across components/pages */
   --surface: var(--bg-secondary);
@@ -39,21 +40,22 @@
 }
 
 [data-theme='light'] {
-  --brand: #059669; /* Darker emerald for light mode */
-  --brand-2: #0891b2; /* Darker cyan for light mode */
+  --brand: #ffb80c;
+  --brand-2: #ffcb4d;
+  --brand-3: #c98a00;
 
-  --bg-primary: #ffffff;
-  --bg-secondary: #f9fafb;
-  --bg-tertiary: #f3f4f6;
+  --bg-primary: #fbf8f0;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f3ecd8;
 
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
+  --text-primary: #2a2216;
+  --text-secondary: #7a6f55;
 
-  --border: #e5e7eb;
-  --border-light: #f3f4f6;
+  --border: #ede3c8;
+  --border-light: #f3ecd8;
 
-  --glow-brand: rgba(5, 150, 105, 0.1);
-  --glow-brand-2: rgba(8, 145, 178, 0.1);
+  --glow-brand: rgba(255, 184, 12, 0.12);
+  --glow-brand-2: rgba(255, 203, 77, 0.12);
 
   --surface: var(--bg-secondary);
   --surface-2: var(--bg-tertiary);

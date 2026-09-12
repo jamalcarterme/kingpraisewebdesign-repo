@@ -7,7 +7,7 @@
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { PAGE_META, generateMetadata, injectSchema, getFAQSchema } from '@/lib/seo';
+import { PAGE_META, generateMetadata, injectSchema, getFAQSchema, getBreadcrumbSchema } from '@/lib/seo';
 
 // ===== Metadata =====
 export const metadata: Metadata = generateMetadata(PAGE_META.home);
@@ -39,7 +39,109 @@ const faqs = [
     answer:
       'Every site we build includes on-page SEO fundamentals such as clean code, fast load times, structured data and keyword-optimized content.',
   },
+  {
+    question: 'Who is King Praise Web Design for?',
+    answer:
+      'We are a web solutions agency in Nigeria built for law firms, real estate agencies, churches, restaurants, ecommerce brands and small business owners across Lagos, Abuja and beyond who want an affordable web developer near them.',
+  },
+  {
+    question: 'Do you build ecommerce websites with online payment in Nigeria?',
+    answer:
+      'Yes, we build ecommerce websites with online payment in Nigeria, including Flutterwave integration, for restaurants, food vendors and retail businesses.',
+  },
+  {
+    question: 'Can I hire a full stack web developer in Nigeria for my business?',
+    answer:
+      'Yes, we work as a full stack web developer for hire in Nigeria using the MERN stack (MongoDB, Express, React, Node.js) to build custom websites and software.',
+  },
 ];
+
+// ===== WebPage Schema =====
+const webPageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: 'Home',
+  url: 'https://www.kingpraisewebdesign.name.ng/',
+  datePublished: '2026-01-15',
+  dateModified: '2026-07-25',
+  author: { '@type': 'Person', name: 'King Praise', url: 'https://www.kingpraisewebdesign.name.ng/about' },
+  publisher: {
+    '@type': 'Organization',
+    name: 'King Praise Web Design',
+    logo: { '@type': 'ImageObject', url: 'https://www.kingpraisewebdesign.name.ng/assets/img/logo-full.png' },
+  },
+};
+
+// ===== Homepage LocalBusiness Schema =====
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  '@id': 'https://www.kingpraisewebdesign.name.ng/#localbusiness',
+  name: 'King Praise Web Design',
+  image: 'https://www.kingpraisewebdesign.name.ng/assets/img/og-image.png',
+  url: 'https://www.kingpraisewebdesign.name.ng/',
+  telephone: '+2349030232048',
+  email: 'kingpraisewebdesign@gmail.com',
+  priceRange: '$$',
+  address: { '@type': 'PostalAddress', addressLocality: 'Lagos', addressRegion: 'Lagos', addressCountry: 'NG' },
+  geo: { '@type': 'GeoCoordinates', latitude: 6.5244, longitude: 3.3792 },
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      opens: '09:00',
+      closes: '18:00',
+    },
+  ],
+  areaServed: [
+    { '@type': 'City', name: 'Lagos' },
+    { '@type': 'City', name: 'Abuja' },
+    { '@type': 'City', name: 'Port Harcourt' },
+    { '@type': 'City', name: 'Ibadan' },
+    { '@type': 'City', name: 'Benin City' },
+    { '@type': 'Country', name: 'Nigeria' },
+  ],
+  knowsAbout: ['Web Design', 'Web Development', 'E-Commerce Development', 'SEO', 'Mobile App Development', 'MERN Stack'],
+  sameAs: ['https://maps.app.goo.gl/rBd7D72nhfCLi8bRA', 'https://www.tiktok.com/@king_praise_web_design'],
+};
+
+// ===== WebSite + SearchAction Schema =====
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'King Praise Web Design',
+  alternateName: 'KPWD Digital',
+  url: 'https://www.kingpraisewebdesign.name.ng/',
+  inLanguage: 'en-NG',
+  publisher: { '@type': 'Organization', name: 'King Praise Web Design' },
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: 'https://www.kingpraisewebdesign.name.ng/blog?q={search_term_string}',
+    },
+    'query-input': 'required name=search_term_string',
+  },
+};
+
+// ===== ItemList Schema (services by industry and city) =====
+const itemListSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Web design services by industry and city',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Web Design Lagos', url: 'https://www.kingpraisewebdesign.name.ng/locations/lagos' },
+    { '@type': 'ListItem', position: 2, name: 'Web Design Abuja', url: 'https://www.kingpraisewebdesign.name.ng/locations/abuja' },
+    { '@type': 'ListItem', position: 3, name: 'Web Design Port Harcourt', url: 'https://www.kingpraisewebdesign.name.ng/locations/port-harcourt' },
+    { '@type': 'ListItem', position: 4, name: 'Web Design Ibadan', url: 'https://www.kingpraisewebdesign.name.ng/locations/ibadan' },
+    { '@type': 'ListItem', position: 5, name: 'Web Design Benin City', url: 'https://www.kingpraisewebdesign.name.ng/locations/benin-city' },
+    { '@type': 'ListItem', position: 6, name: 'Law Firm Web Design', url: 'https://www.kingpraisewebdesign.name.ng/services/law-firms' },
+    { '@type': 'ListItem', position: 7, name: 'Real Estate Website Design', url: 'https://www.kingpraisewebdesign.name.ng/services/real-estate' },
+    { '@type': 'ListItem', position: 8, name: 'Restaurant Website Design', url: 'https://www.kingpraisewebdesign.name.ng/services/restaurant' },
+    { '@type': 'ListItem', position: 9, name: 'E-Commerce Web Design Abuja', url: 'https://www.kingpraisewebdesign.name.ng/services/ecommerce' },
+    { '@type': 'ListItem', position: 10, name: 'SEO Services for Small Business', url: 'https://www.kingpraisewebdesign.name.ng/services/seo' },
+  ],
+};
 
 // ===== Home Page Component =====
 export default function HomePage() {
@@ -47,6 +149,12 @@ export default function HomePage() {
     <>
       {/* ===== Inject FAQ Schema ===== */}
       {injectSchema(getFAQSchema(faqs))}
+      {injectSchema(getBreadcrumbSchema([{ name: 'Home', url: '/' }]))}
+      {injectSchema(webPageSchema)}
+      {injectSchema(PAGE_META.home.schema as Record<string, unknown>)}
+      {injectSchema(localBusinessSchema)}
+      {injectSchema(websiteSchema)}
+      {injectSchema(itemListSchema)}
 
       <main className="flex-1">
         {/* ===== Hero Section ===== */}
