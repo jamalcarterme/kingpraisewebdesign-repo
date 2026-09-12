@@ -55,16 +55,20 @@ export default function CookieConsent() {
       )}
 
       {visible && (
-        <div className="fixed bottom-0 inset-x-0 z-[95] p-4 sm:p-6">
-          <div className="glass rounded-2xl max-w-3xl mx-auto p-5 sm:p-6 flex flex-col sm:flex-row items-center gap-4 shadow-lg">
-            <p className="text-sm text-slate-300 flex-1 text-center sm:text-left">
-              We use cookies for analytics to understand how visitors use this site. You can accept or decline —
-              declining won&apos;t affect your browsing.{' '}
-              <Link href="/contact" className="text-[var(--brand-2)] hover:underline">Questions? Contact us</Link>.
+        <div className="fixed bottom-0 inset-x-0 z-[95] border-t border-white/10 bg-[var(--surface)]/98 backdrop-blur-md">
+          <div className="max-w-7xl mx-auto px-5 py-4 flex flex-col sm:flex-row items-center gap-3 sm:gap-6">
+            <p className="text-xs sm:text-sm text-slate-400 flex-1 text-center sm:text-left leading-relaxed">
+              We use cookies to analyze site traffic and improve your experience. By clicking &ldquo;Accept&rdquo;,
+              you agree to our use of cookies.{' '}
+              <Link href="/contact" className="text-[var(--brand-2)] hover:underline whitespace-nowrap">Learn more</Link>
             </p>
             <div className="flex gap-3 shrink-0">
-              <button onClick={() => choose('declined')} className="btn-ghost px-4 py-2 rounded-lg text-sm">Decline</button>
-              <button onClick={() => choose('accepted')} className="btn-primary px-4 py-2 rounded-lg text-sm">Accept</button>
+              <button onClick={() => choose('declined')} className="text-xs sm:text-sm font-semibold text-slate-400 hover:text-white px-3 py-2 transition">
+                Decline
+              </button>
+              <button onClick={() => choose('accepted')} className="text-xs sm:text-sm font-semibold bg-[var(--brand)] hover:bg-[var(--brand-2)] text-white px-5 py-2 rounded-lg transition">
+                Accept
+              </button>
             </div>
           </div>
         </div>

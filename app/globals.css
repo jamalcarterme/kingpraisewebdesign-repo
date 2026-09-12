@@ -146,7 +146,7 @@ a {
 }
 
 .btn-primary {
-  @apply btn bg-[var(--brand)] text-white hover:bg-[var(--brand-2)] shadow-lg hover:shadow-glow-brand;
+  @apply btn bg-[var(--brand)] text-white hover:bg-[var(--brand-2)] shadow-lg hover:shadow-glow;
 }
 
 .btn-secondary {
@@ -154,7 +154,7 @@ a {
 }
 
 .btn-ghost {
-  @apply btn border-2 border-[var(--brand)] text-[var(--brand)] hover:bg-[var(--brand)]/10;
+  @apply btn border-2 border-[var(--brand)] text-[var(--brand)] hover:bg-[var(--glow-brand)];
 }
 
 .btn-outline {
@@ -405,18 +405,20 @@ select:disabled {
 /* ===== Print Styles ===== */
 @media print {
   body {
-    @apply bg-white text-black;
+    background: #fff;
+    color: #000;
   }
 
   .no-print,
   nav,
   footer,
   .glow-orb {
-    @apply hidden !important;
+    display: none !important;
   }
 
   a {
-    @apply text-black underline;
+    color: #000;
+    text-decoration: underline;
   }
 
   h1,
@@ -425,11 +427,12 @@ select:disabled {
   h4,
   h5,
   h6 {
-    @apply page-break-after-avoid;
+    page-break-after: avoid;
   }
 
   p {
-    @apply orphans-3 widows-3;
+    orphans: 3;
+    widows: 3;
   }
 }
 
